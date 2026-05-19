@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CrownBet Funnel</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#F5C842;--gold2:#C9A020;
+  --bg:#07070F;--bg2:#0D0D1B;--bg3:#131325;--bg4:#191930;
+  --border:rgba(245,200,66,0.12);--border2:rgba(245,200,66,0.25);
+  --text:#EEEEF8;--muted:#5A5A8A;--dim:#2A2A4A;
+  --green:#22C55E;--red:#EF4444;--blue:#3B82F6;
+}
+body{font-family:'Rubik',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;direction:rtl}
+
+.topbar{
+  position:sticky;top:0;z-index:100;
+  background:rgba(7,7,15,0.92);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.5rem;height:60px;
+}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.brand-name{font-size:16px;font-weight:900;background:linear-gradient(135deg,var(--gold),#FFE08A);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.status-badge{display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:100px;border:1px solid rgba(34,197,94,0.2);background:rgba(34,197,94,0.06);font-size:12px;font-weight:500;color:var(--green)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:p 2s infinite}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.2}}
+
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 60px)}
+
+.sidebar{background:var(--bg2);border-left:1px solid var(--border);padding:1.25rem 0}
+.nav-section{padding:0 1rem;margin-bottom:1.5rem}
+.nav-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;padding-right:8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .18s;margin-bottom:2px}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:rgba(245,200,66,0.1);color:var(--gold);border:1px solid var(--border)}
+.nav-icon{font-size:16px;opacity:.7}
+
+.content{padding:1.75rem;overflow-y:auto}
+
+.page{display:none}
+.page.active{display:block}
+
+.page-header{margin-bottom:1.75rem}
+.page-title{font-size:22px;font-weight:900;color:var(--text);margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--muted)}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:1rem}
+.card-head{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.card-body{padding:1.25rem}
+
+.menu-builder{display:flex;flex-direction:column;gap:10px}
+.menu-item{background:var(--bg3);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s}
+.menu-item:hover{border-color:var(--border2)}
+.menu-item-head{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer}
+.menu-num{width:30px;height:30px;border-radius:8px;background:rgba(245,200,66,0.15);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--gold);flex-shrink:0}
+.menu-item-title{flex:1;font-size:14px;font-weight:600;color:var(--text)}
+.menu-item-preview{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.menu-item-body{padding:0 14px 14px;display:none}
+.menu-item-body.open{display:block}
+.chevron{font-size:14px;color:var(--muted);transition:transform .2s}
+.chevron.open{transform:rotate(180deg)}
+
+.field{margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+.field-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block}
+input,textarea,select{
+  width:100%;background:var(--bg4);border:1px solid var(--border);
+  border-radius:9px;padding:9px 12px;color:var(--text);
+  font-family:'Rubik',sans-serif;font-size:13px;
+  transition:border-color .2s;resize:none
+}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold2)}
+textarea{line-height:1.6;min-height:90px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 18px;border:none;border-radius:10px;font-family:'Rubik',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .18s}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;width:100%;margin-top:12px}
+.btn-gold:hover{opacity:.9;transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-outline:hover{color:var(--text);border-color:var(--border2)}
+.btn-danger{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+.btn-green{background:linear-gradient(135deg,#22C55E,#16A34A);color:#fff;width:100%;margin-top:8px}
+
+.add-btn{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:1px dashed var(--border2);background:transparent;color:var(--gold);font-family:'Rubik',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .18s;width:100%;justify-content:center}
+.add-btn:hover{background:rgba(245,200,66,.06)}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+
+.stat{background:var(--bg3);border-radius:12px;padding:1rem 1.25rem}
+.stat-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.stat-val{font-size:26px;font-weight:900;color:var(--gold)}
+.stat-val.green{color:var(--green)}
+.stat-val.blue{color:var(--blue)}
+
+.tag{display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:600}
+.tag-green{background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.2)}
+.tag-gold{background:rgba(245,200,66,.1);color:var(--gold);border:1px solid var(--border)}
+
+.section-divider{height:1px;background:var(--border);margin:16px 0}
+
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--bg2);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:12px 22px;font-size:13px;font-weight:500;color:var(--green);z-index:999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.err{border-color:rgba(239,68,68,.3);color:var(--red)}
+
+.send-row{display:flex;gap:10px}
+.send-row input{flex:1}
+
+@media(max-width:700px){.layout{grid-template-columns:1fr}.sidebar{display:none}.grid2,.grid3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-icon">👑</div>
+    <div>
+      <div class="brand-name">CrownBet Funnel</div>
+    </div>
+  </div>
+  <div class="status-badge" id="statusBadge"><div class="dot"></div>בודק...</div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="nav-section">
+      <div class="nav-label">ניהול</div>
+      <div class="nav-item active" onclick="showPage('menu',this)">
+        <span class="nav-icon">📋</span> בניית תפריט
+      </div>
+      <div class="nav-item" onclick="showPage('messages',this)">
+        <span class="nav-icon">💬</span> הודעות
+      </div>
+      <div class="nav-item" onclick="showPage('deposit',this)">
+        <span class="nav-icon">💰</span> פרטי הפקדה
+      </div>
+      <div class="nav-item" onclick="showPage('links',this)">
+        <span class="nav-icon">🔗</span> קישורים
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">פעולות</div>
+      <div class="nav-item" onclick="showPage('send',this)">
+        <span class="nav-icon">📤</span> שליחה ידנית
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- בניית תפריט -->
+    <div class="page active" id="page-menu">
+      <div class="page-header">
+        <div class="page-title">בניית תפריט</div>
+        <div class="page-sub">הגדר מה הבוט ישלח לכל בחירה של הלקוח</div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">🏠 הודעת ברוך הבא</div>
+          <span class="tag tag-gold">תפריט ראשי</span>
+        </div>
+        <div class="card-body">
+          <div class="field">
+            <label class="field-label">טקסט ההודעה הראשונה</label>
+            <textarea id="welcome-msg" placeholder="ברוך הבא! בחר אפשרות..."></textarea>
+          </div>
+          <div style="font-size:12px;color:var(--muted)">💡 הלקוח יקבל הודעה זו כשיכתוב "היי", "שלום", "סוכן" וכו'</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">📋 אפשרויות תפריט</div>
+          <button class="btn btn-outline" onclick="addMenuItem()" style="padding:6px 12px;font-size:12px">+ הוסף אפשרות</button>
+        </div>
+        <div class="card-body">
+          <div class="menu-builder" id="menuBuilder"></div>
+        </div>
+      </div>
+
+      <button class="btn btn-gold" onclick="saveAll()">💾 שמור את כל השינויים</button>
+    </div>
+
+    <!-- הודעות -->
+    <div class="page" id="page-messages">
+      <div class="page-header">
+        <div class="page-title">הודעות מערכת</div>
+        <div class="page-sub">הודעות שהבוט שולח אוטומטית</div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-title">📸 אישור קבלת צילום מסך</div></div>
+        <div class="card-body">
+          <textarea id="msg-screenshot" placeholder="קיבלנו את האישור! נציג יבדוק בהקדם..."></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-title">🔔 התראת הפקדה לאסי</div></div>
+        <div class="card-body">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:10px">💡 {phone} יוחלף אוטומטית במספר הלקוח</div>
+          <textarea id="msg-admin-deposit" placeholder="לקוח {phone} שלח צילום מסך הפקדה!"></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-title">👤 בקשת נציג אנושי</div></div>
+        <div class="card-body">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:10px">💡 {phone} יוחלף אוטומטית במספר הלקוח</div>
+          <textarea id="msg-admin-support" placeholder="לקוח {phone} מחכה לנציג!"></textarea>
+        </div>
+      </div>
+
+      <button class="btn btn-gold" onclick="saveAll()">💾 שמור</button>
+    </div>
+
+    <!-- הפקדה -->
+    <div class="page" id="page-deposit">
+      <div class="page-header">
+        <div class="page-title">פרטי הפקדה</div>
+        <div class="page-sub">הפרטים שהבוט ישלח ללקוח שרוצה להפקיד</div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <div class="field">
+            <label class="field-label">ביט (מספר טלפון)</label>
+            <input id="dep-bit" placeholder="050-XXXXXXX" />
+          </div>
+          <div class="field">
+            <label class="field-label">העברה בנקאית</label>
+            <textarea id="dep-bank" style="min-height:60px" placeholder="בנק, מספר חשבון, סניף..."></textarea>
+          </div>
+          <div class="field">
+            <label class="field-label">קריפטו</label>
+            <input id="dep-crypto" placeholder="USDT TRC20: T..." />
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-gold" onclick="saveAll()">💾 שמור</button>
+    </div>
+
+    <!-- קישורים -->
+    <div class="page" id="page-links">
+      <div class="page-header">
+        <div class="page-title">קישורי כניסה</div>
+        <div class="page-sub">קישורים שהבוט ישלח ללקוחות</div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <div class="field">
+            <label class="field-label">קזינו וסלוטים</label>
+            <input id="link-casino" type="url" placeholder="https://" />
+          </div>
+          <div class="field">
+            <label class="field-label">פוקר</label>
+            <input id="link-poker" type="url" placeholder="https://" />
+          </div>
+          <div class="field">
+            <label class="field-label">אפליקציה</label>
+            <input id="link-app" type="url" placeholder="https://" />
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-gold" onclick="saveAll()">💾 שמור</button>
+    </div>
+
+    <!-- שליחה ידנית -->
+    <div class="page" id="page-send">
+      <div class="page-header">
+        <div class="page-title">שליחה ידנית</div>
+        <div class="page-sub">שלח הודעה ישירות ללקוח</div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <div class="field">
+            <label class="field-label">מספר טלפון (ללא +, ללא מקפים)</label>
+            <input id="send-phone" placeholder="972501234567" />
+          </div>
+          <div class="field">
+            <label class="field-label">הודעה</label>
+            <textarea id="send-msg" placeholder="...כתוב הודעה"></textarea>
+          </div>
+          <button class="btn btn-green" onclick="sendManual()">📤 שלח עכשיו</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SERVER = window.location.origin;
+let config = { menuItems: [], messages: {}, deposit: {}, links: {} };
+
+async function loadConfig() {
+  try {
+    const r = await fetch(SERVER + '/api/config');
+    config = await r.json();
+    populateForm();
+    renderMenu();
+  } catch(e) { showToast('שגיאה בטעינה', true); }
+}
+
+function populateForm() {
+  setVal('welcome-msg', config.messages?.welcome || '');
+  setVal('msg-screenshot', config.messages?.screenshot || '');
+  setVal('msg-admin-deposit', config.messages?.adminDeposit || '');
+  setVal('msg-admin-support', config.messages?.adminSupport || '');
+  setVal('dep-bit', config.deposit?.bit || '');
+  setVal('dep-bank', config.deposit?.bank || '');
+  setVal('dep-crypto', config.deposit?.crypto || '');
+  setVal('link-casino', config.links?.casino || '');
+  setVal('link-poker', config.links?.poker || '');
+  setVal('link-app', config.links?.app || '');
+}
+
+function setVal(id, val) { const el = document.getElementById(id); if(el) el.value = val; }
+function getVal(id) { const el = document.getElementById(id); return el ? el.value : ''; }
+
+function renderMenu() {
+  const items = config.menuItems || [];
+  const builder = document.getElementById('menuBuilder');
+  builder.innerHTML = '';
+  items.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'menu-item';
+    div.innerHTML = `
+      <div class="menu-item-head" onclick="toggleItem(${i})">
+        <div class="menu-num">${item.key || (i+1)}</div>
+        <div style="flex:1;min-width:0">
+          <div class="menu-item-title">${item.label || 'אפשרות ' + (i+1)}</div>
+          <div class="menu-item-preview">${(item.response || '').substring(0,50)}...</div>
+        </div>
+        <span class="chevron" id="chev-${i}">▼</span>
+      </div>
+      <div class="menu-item-body" id="body-${i}">
+        <div class="grid2" style="margin-bottom:10px">
+          <div class="field">
+            <label class="field-label">מספר בחירה</label>
+            <input value="${item.key || (i+1)}" onchange="updateItem(${i},'key',this.value)" placeholder="1" />
+          </div>
+          <div class="field">
+            <label class="field-label">כותרת (לתצוגה)</label>
+            <input value="${item.label || ''}" onchange="updateItem(${i},'label',this.value)" placeholder="כניסה למשחקים" />
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">הודעה שהבוט ישלח</label>
+          <textarea onchange="updateItem(${i},'response',this.value)" placeholder="כתוב את ההודעה שתישלח ללקוח...">${item.response || ''}</textarea>
+        </div>
+        <div class="field">
+          <label class="field-label">סוג תגובה</label>
+          <select onchange="updateItem(${i},'type',this.value)">
+            <option value="text" ${item.type==='text'?'selected':''}>טקסט רגיל</option>
+            <option value="deposit" ${item.type==='deposit'?'selected':''}>הפקדה (שולח פרטי תשלום)</option>
+            <option value="links" ${item.type==='links'?'selected':''}>קישורים (שולח קישורי כניסה)</option>
+            <option value="admin" ${item.type==='admin'?'selected':''}>נציג (מעביר לאסי)</option>
+          </select>
+        </div>
+        <button class="btn btn-danger" style="width:100%;margin-top:8px" onclick="removeItem(${i})">🗑 מחק אפשרות זו</button>
+      </div>
+    `;
+    builder.appendChild(div);
+  });
+}
+
+function toggleItem(i) {
+  const body = document.getElementById('body-' + i);
+  const chev = document.getElementById('chev-' + i);
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+function updateItem(i, field, val) {
+  if (!config.menuItems[i]) return;
+  config.menuItems[i][field] = val;
+  renderMenu();
+}
+
+function addMenuItem() {
+  if (!config.menuItems) config.menuItems = [];
+  config.menuItems.push({ key: String(config.menuItems.length + 1), label: '', response: '', type: 'text' });
+  renderMenu();
+  setTimeout(() => {
+    const last = config.menuItems.length - 1;
+    const body = document.getElementById('body-' + last);
+    const chev = document.getElementById('chev-' + last);
+    if(body) body.classList.add('open');
+    if(chev) chev.classList.add('open');
+  }, 50);
+}
+
+function removeItem(i) {
+  config.menuItems.splice(i, 1);
+  renderMenu();
+}
+
+async function saveAll() {
+  config.messages = {
+    welcome: getVal('welcome-msg'),
+    screenshot: getVal('msg-screenshot'),
+    adminDeposit: getVal('msg-admin-deposit'),
+    adminSupport: getVal('msg-admin-support'),
+  };
+  config.deposit = {
+    bit: getVal('dep-bit'),
+    bank: getVal('dep-bank'),
+    crypto: getVal('dep-crypto'),
+  };
+  config.links = {
+    casino: getVal('link-casino'),
+    poker: getVal('link-poker'),
+    app: getVal('link-app'),
+  };
+
+  try {
+    const r = await fetch(SERVER + '/api/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(config)
+    });
+    if (r.ok) showToast('✅ נשמר בהצלחה!');
+    else showToast('❌ שגיאה בשמירה', true);
+  } catch(e) { showToast('❌ שגיאת חיבור', true); }
+}
+
+async function sendManual() {
+  const phone = getVal('send-phone').trim();
+  const message = getVal('send-msg').trim();
+  if (!phone || !message) { showToast('❌ מלא מספר והודעה', true); return; }
+  try {
+    const r = await fetch(SERVER + '/api/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to: phone, message })
+    });
+    if (r.ok) showToast('✅ הודעה נשלחה!');
+    else showToast('❌ שגיאה', true);
+  } catch(e) { showToast('❌ שגיאת חיבור', true); }
+}
+
+async function checkStatus() {
+  try {
+    const r = await fetch(SERVER + '/api/status');
+    const d = await r.json();
+    const el = document.getElementById('statusBadge');
+    if (d.ready) {
+      el.innerHTML = '<div class="dot"></div>מחובר ✓';
+    } else {
+      el.innerHTML = '<div class="dot" style="background:var(--red);box-shadow:0 0 8px var(--red)"></div>לא מחובר';
+      el.style.cssText = 'border-color:rgba(239,68,68,.2);background:rgba(239,68,68,.06);color:var(--red);display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:100px;border:1px solid;font-size:12px;font-weight:500';
+    }
+  } catch {}
+}
+
+function showPage(name, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  el.classList.add('active');
+}
+
+let tt;
+function showToast(msg, err) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (err ? ' err' : '');
+  clearTimeout(tt);
+  tt = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+loadConfig();
+checkStatus();
+setInterval(checkStatus, 30000);
+</script>
+</body>
+</html>
